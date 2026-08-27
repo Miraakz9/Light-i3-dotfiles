@@ -1,0 +1,49 @@
+[colors.primary]
+background = "#000000"
+foreground = "#FFFFFF"
+
+[colors.normal]
+black = "#000000"
+red = "#DC322F"
+green = "#56DB3A"
+yellow = "#FF8400"
+blue = "#0084D4"
+magenta = "#B729D9"
+cyan = "#CCCCFF"
+white = "#FFFFFF"
+
+[colors.bright]
+black = "#D6DBE5"
+red = "#DC322F"
+green = "#56DB3A"
+yellow = "#FF8400"
+blue = "#0084D4"
+magenta = "#B729D9"
+cyan = "#CCCCFF"
+white = "#FFFFFF"
+
+[font]
+size = 13.0
+
+[font.normal]
+family = "Inconsolata Nerd Font Mono"
+style = "Regular"
+
+[font.bold]
+family = "Inconsolata Nerd Font Mono"
+style = "Bold"
+
+[font.italic]
+family = "Inconsolata Nerd Font Mono"
+style = "Italic"
+
+[font.bold_italic]
+family = "Inconsolata Nerd Font Mono"
+style = "Bold Italic"
+
+[shell]
+program = "/bin/bash"
+args = [
+    "--rcfile",
+    "$HOME/.config/rofi/.bashrc-alacritty",
+]
