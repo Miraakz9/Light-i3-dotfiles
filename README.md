@@ -1,7 +1,7 @@
 # Light-i3-dotfiles
 
 A lightweight and minimalistic desktop environment built around the **i3 window manager**.
-This i3wm setup was made on Linux Mint 22.2 Zara XFCE.
+This i3wm setup was made on Linux Mint 22.2 Zara XFCE. **Note:** This setup is still work in progress, It is meant to be as lightweight as possible while still looking aesthetically pleasing.
 
 ![Light i3 Desktop](wallpapers/2026-08-28_17-36.png)
 
