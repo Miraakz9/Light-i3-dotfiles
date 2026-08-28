@@ -2,27 +2,27 @@
 
 A lightweight and minimalistic desktop environment built around the **i3 window manager**.
 
-![Light i3 desktop](screenshots/setup.png)
+![Light i3 Desktop](wallpapers/2026-08-28_17-36.png)
 
-## ✨ Features
+## Features
 
-- 🪟 i3 window manager
-- 📊 Polybar
-- 🚀 Rofi application launcher
-- 🖥️ Picom compositor
-- 🔒 i3lock
-- 💻 Alacritty terminal
-- 🔔 Dunst notifications
-- 🌙 Redshift night mode
-- 🎨 Custom Rofi themes
-- 🖼️ Wallpaper collection
-- 📈 Fastfetch configuration
-- 🔊 Volume and media controls
-- ☀️ Brightness controls
-- 📸 Screenshot utilities
-- ⚡ Lightweight and keyboard-driven workflow
+-  i3 window manager
+-  Polybar
+-  Rofi application launcher
+-  Picom compositor
+-  i3lock
+-  Alacritty terminal
+-  Dunst notifications
+-  Redshift night mode
+-  Custom Rofi themes
+-  Wallpaper collection
+-  Fastfetch configuration
+-  Volume and media controls
+-  Brightness controls
+-  Screenshot utilities
+-  Lightweight and keyboard-driven workflow
 
-## 📦 Installation
+## Installation
 
 Clone the repository:
 
