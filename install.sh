@@ -112,6 +112,9 @@ PACKAGES=(
     powertop
     fastfetch
     redshift
+    cava
+    cmatrix
+    tty-clock
 )
 
 info "Installing required packages..."
