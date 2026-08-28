@@ -39,7 +39,7 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- ~/.config/i3/lock.sh
 exec --no-startup-id sh -c "echo off > ~/.cache/redshift_mode"
 
 #polybar
-exec_always --no-startup-id polybar main -c ~/.config/polybar/config.iniIio
+exec --no-startup-id polybar main -c ~/.config/polybar/config.ini
 
 #apply xfce theme to x apps
 exec --no-startup-id xfsettingsd
@@ -82,6 +82,9 @@ tiling_drag modifier titlebar
 
 # start a terminal
 bindsym $mod+e exec --no-startup-id alacritty
+
+#Shortcuts menu
+bindsym $mod+d exec --no-startup-id ~/.config/rofi/shortcuts/shortcuts.sh
 
 # My shortcuts
 bindsym Print exec flameshot gui
