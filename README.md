@@ -11,11 +11,11 @@ This i3wm setup was made on Linux Mint 22.2 Zara XFCE.
 -  Polybar
 -  Rofi application launcher
 -  Picom compositor
--  i3lock
+-  i3lock (optional)
 -  Alacritty terminal
 -  Dunst notifications
 -  Redshift night mode
--  Custom Rofi themes
+-  Game mode
 -  Wallpaper collection
 -  Fastfetch configuration
 -  Volume and media controls
@@ -30,3 +30,15 @@ Clone the repository:
 ```bash
 git clone https://github.com/Miraakz9/Light-i3-dotfiles.git
 cd Light-i3-dotfiles
+```
+## Auto install everything for fresh i3wm installation
+
+Auto installer for fresh i3wm installation is untested, latest picom verison 13 needs to be installed manually.
+
+```bash
+chmod +x install.sh
+./install.sh
+```
+The installer will install the required dependencies and deploy the configuration files.
+
+Note: This setup is designed for Linux Mint / Ubuntu-based systems. Mod+D to view keybinds.
