@@ -22,3 +22,6 @@ ranger
 powertop
 fastfetch
 redshift
+cava
+cmatrix
+tty-clock

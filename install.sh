@@ -76,11 +76,11 @@ fi
 # Update package lists
 # ------------------------------------------
 
-info "Updating APT package lists..."
+info "Updating apt package lists..."
 
 sudo apt update
 
-success "APT package lists updated."
+success "apt package lists updated."
 
 # ------------------------------------------
 # Install required packages
@@ -112,6 +112,9 @@ PACKAGES=(
     powertop
     fastfetch
     redshift
+    cava
+    cmatrix
+    tty-clock
 )
 
 info "Installing required packages..."
@@ -192,7 +195,7 @@ if [[ "$BACKUP_NEEDED" == true ]]; then
     done
 
     echo
-    read -r -p "Back them up before continuing? [Y/n]: " answer
+    read -r -p "Back up before continuing? [Y/n]: " answer
     answer="${answer:-Y}"
 
     if [[ "$answer" =~ ^[Yy]$ ]]; then
