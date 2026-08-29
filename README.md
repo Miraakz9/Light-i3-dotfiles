@@ -41,4 +41,4 @@ chmod +x install.sh
 ```
 The installer will install the required dependencies and deploy the configuration files.
 
-Note: This setup is designed for Linux Mint / Ubuntu-based systems. Mod+D to view keybinds.
+Note: This install script is designed for Linux Mint / Ubuntu-based systems. Mod+D to view keybinds.
