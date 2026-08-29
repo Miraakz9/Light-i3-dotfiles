@@ -1,0 +1,19 @@
+#!/bin/sh
+
+STATE="$HOME/.cache/redshift_mode"
+TEMP=3000
+
+[ -f "$STATE" ] || echo off > "$STATE"
+
+MODE=$(cat "$STATE")
+
+if [ "$MODE" = "off" ]; then
+    # Always apply temperature fresh
+    redshift -P -O $TEMP >/dev/null 2>&1
+    echo on > "$STATE"
+else
+    # Always reset gamma
+    redshift -x >/dev/null 2>&1
+    echo off > "$STATE"
+fi
+

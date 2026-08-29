@@ -1,0 +1,17 @@
+#!/bin/sh
+
+STATE="$HOME/.cache/picom_mode"
+
+[ -f "$STATE" ] || echo safe > "$STATE"
+
+MODE=$(cat "$STATE")
+
+pkill picom
+
+if [ "$MODE" = "safe" ]; then
+    picom --config ~/.config/picom/picom-fancy.conf &
+    echo fancy > "$STATE"
+else
+    picom --config ~/.config/picom/picom-safe.conf &
+    echo safe > "$STATE"
+fi

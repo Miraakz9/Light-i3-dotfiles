@@ -1,0 +1,18 @@
+#!/bin/sh
+
+DEVICE="intel_backlight"
+MIN=5    # minimum percentage
+STEP=5
+
+CUR=$(brightnessctl -d "$DEVICE" -m | cut -d, -f4 | tr -d '%')
+
+case "$1" in
+  up)
+    brightnessctl -d "$DEVICE" set +${STEP}% ;;
+  down)
+    if [ "$CUR" -le "$MIN" ]; then
+      brightnessctl -d "$DEVICE" set ${MIN}% 
+    else
+      brightnessctl -d "$DEVICE" set ${STEP}%-
+    fi ;;
+esac
