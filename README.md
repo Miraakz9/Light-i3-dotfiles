@@ -42,3 +42,5 @@ chmod +x install.sh
 The installer will install the required dependencies and deploy the configuration files.
 
 Note: This install script is designed for Linux Mint / Ubuntu-based systems. Mod+D to view keybinds.
+
+**Use ![Gogh](https://gogh-co.github.io/Gogh/) for terminal themes.**
