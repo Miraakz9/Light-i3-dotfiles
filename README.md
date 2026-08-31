@@ -33,7 +33,7 @@ cd Light-i3-dotfiles
 ```
 ## Auto install everything for fresh i3wm installation
 
-Auto installer for fresh i3wm installation is untested, latest picom verison 13 needs to be installed manually.
+Auto installer for fresh i3wm installation is untested, ![latest picom verison](https://github.com/yshui/picom) 13 needs to be installed manually.
 
 ```bash
 chmod +x install.sh
@@ -42,3 +42,5 @@ chmod +x install.sh
 The installer will install the required dependencies and deploy the configuration files.
 
 Note: This install script is designed for Linux Mint / Ubuntu-based systems. Mod+D to view keybinds.
+
+**Use [Gogh](https://gogh-co.github.io/Gogh/) for terminal themes.**
