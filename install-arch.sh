@@ -136,9 +136,6 @@ PACKAGES=(
     pulseaudio
     pulseaudio-alsa
     alsa-utils
-    xorg-xset
-    xorg-xrandr
-    xorg-xsetroot
     xdotool
     maim
     flameshot
@@ -155,6 +152,41 @@ PACKAGES=(
     cmatrix
 )
 
+# ------------------------------------------
+# Xorg / X11 packages required to run i3
+# ------------------------------------------
+#
+# i3 is an X11 window manager, so a working
+# Xorg stack has to be present. On Debian
+# this mostly comes bundled via metapackages
+# (xserver-xorg, x11-xserver-utils); Arch
+# ships these as separate packages.
+# ------------------------------------------
+
+XORG_PACKAGES=(
+    xorg-server
+    xorg-xinit
+    xorg-xset
+    xorg-xrandr
+    xorg-xsetroot
+    xorg-xprop
+    xorg-xwininfo
+    xorg-xkill
+    xorg-xmodmap
+    xorg-xdpyinfo
+    xorg-xbacklight
+    xorg-xrdb
+    xorg-xhost
+    mesa
+)
+
+# Fonts commonly needed for i3/polybar/rofi glyphs and icons
+FONT_PACKAGES=(
+    ttf-dejavu
+    ttf-font-awesome
+    noto-fonts
+)
+
 # Packages only available in the AUR
 AUR_PACKAGES=(
     light
@@ -166,6 +198,66 @@ info "Installing required packages..."
 sudo pacman -S --needed --noconfirm "${PACKAGES[@]}"
 
 success "Required packages installed."
+
+info "Installing Xorg/X11 packages..."
+
+sudo pacman -S --needed --noconfirm "${XORG_PACKAGES[@]}"
+
+success "Xorg/X11 packages installed."
+
+info "Installing fonts (icons/glyphs for polybar & rofi)..."
+
+sudo pacman -S --needed --noconfirm "${FONT_PACKAGES[@]}"
+
+success "Fonts installed."
+
+# ------------------------------------------
+# GPU driver (best-effort auto-detect)
+# ------------------------------------------
+#
+# Xorg needs a video driver to actually put
+# anything on screen. This is hardware
+# dependent, so we try to detect it via lspci
+# and fall back to the generic modesetting
+# driver (via mesa) if detection fails.
+# ------------------------------------------
+
+info "Detecting GPU for video driver selection..."
+
+if command -v lspci >/dev/null 2>&1; then
+    GPU_INFO="$(lspci | grep -iE 'vga|3d|display' || true)"
+else
+    GPU_INFO=""
+    warning "lspci not found (pciutils not installed); skipping GPU auto-detection."
+fi
+
+DRIVER_PACKAGES=()
+
+if [[ "$GPU_INFO" == *"Intel"* ]]; then
+    info "Intel GPU detected."
+    DRIVER_PACKAGES+=(xf86-video-intel vulkan-intel)
+elif [[ "$GPU_INFO" == *"AMD"* || "$GPU_INFO" == *"ATI"* ]]; then
+    info "AMD GPU detected."
+    DRIVER_PACKAGES+=(xf86-video-amdgpu vulkan-radeon)
+elif [[ "$GPU_INFO" == *"NVIDIA"* ]]; then
+    info "NVIDIA GPU detected."
+    DRIVER_PACKAGES+=(xf86-video-nouveau)
+    warning "Open-source nouveau driver will be installed."
+    warning "For proprietary drivers, install 'nvidia' or 'nvidia-dkms' separately."
+elif [[ -n "$GPU_INFO" ]]; then
+    warning "Unrecognized GPU: $GPU_INFO"
+    warning "Falling back to generic modesetting driver (via mesa)."
+else
+    warning "Could not detect GPU. Falling back to generic modesetting driver (via mesa)."
+fi
+
+if [[ "${#DRIVER_PACKAGES[@]}" -gt 0 ]]; then
+    info "Installing video driver packages: ${DRIVER_PACKAGES[*]}"
+    sudo pacman -S --needed --noconfirm "${DRIVER_PACKAGES[@]}"
+    success "Video driver packages installed."
+else
+    info "No dedicated driver package installed; the generic 'modesetting' driver (provided by mesa/xorg-server) will be used."
+fi
 
 if [[ "$HAVE_YAY" == true ]]; then
     info "Installing AUR packages (light, tty-clock)..."
@@ -356,7 +448,7 @@ success "Light i3 configuration installed."
 
 echo
 echo "Installed components:"
-echo "  i3"
+echo "  i3 (Xorg + xinit)"
 echo "  Polybar"
 echo "  Rofi"
 echo "  Alacritty"
@@ -365,6 +457,9 @@ echo "  Dunst"
 echo "  Redshift"
 echo "  Wallpapers"
 echo
+
+info "If you don't use a display manager, start i3 with 'startx' after"
+info "adding 'exec i3' to ~/.xinitrc."
 
 if [[ -n "${BACKUP_DIR:-}" && -d "$BACKUP_DIR" ]]; then
     echo "Backup:"
