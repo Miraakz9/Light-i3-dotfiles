@@ -39,8 +39,8 @@ Auto installer for fresh i3wm installation is untested, ![latest picom verison](
 chmod +x install.sh
 ./install.sh
 ```
-The installer will install the required dependencies and deploy the configuration files.
+The installer will install the required dependencies and deploy the main configuration files.
 
-Note: This install script is designed for Linux Mint / Ubuntu-based systems. Mod+D to view keybinds.
+Note: This install script is designed for Linux Mint / Ubuntu-based systems, please manually move the Polybar scripts to their respective locations as shown in the Polybar config. Mod+D to view keybinds.
 
 **Use [Gogh](https://gogh-co.github.io/Gogh/) for terminal themes.**
