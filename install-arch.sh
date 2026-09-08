@@ -72,6 +72,11 @@ if ! command -v sudo >/dev/null 2>&1; then
     exit 1
 fi
 
+if ! command -v curl >/dev/null 2>&1; then
+    info "Installing curl (needed to check for the latest picom release)..."
+    sudo pacman -S --needed --noconfirm curl
+fi
+
 # ------------------------------------------
 # Check / install an AUR helper (yay)
 # ------------------------------------------
@@ -164,8 +169,12 @@ PACKAGES=(
 # ------------------------------------------
 
 XORG_PACKAGES=(
+    # Display server + common files
     xorg-server
+    xorg-server-common
     xorg-xinit
+
+    # CLI tools used by i3/polybar/rofi scripts and for troubleshooting
     xorg-xset
     xorg-xrandr
     xorg-xsetroot
@@ -177,7 +186,41 @@ XORG_PACKAGES=(
     xorg-xbacklight
     xorg-xrdb
     xorg-xhost
+    xorg-xinput
+    xorg-xauth
+
+    # Input drivers - without these, keyboard/mouse/touchpad
+    # won't be recognized by the X server
+    xf86-input-libinput
+    xf86-input-evdev
+
+    # GL/rendering stack (video driver packages are appended
+    # separately based on detected GPU vendor below)
     mesa
+    vulkan-icd-loader
+
+    # Core X11 client libraries relied on by i3, polybar, rofi,
+    # alacritty, dunst, feh, picom, etc.
+    libx11
+    libxcb
+    libxft
+    libxinerama
+    libxrandr
+    libxrender
+    libxcursor
+    libxfixes
+    libxi
+    libxext
+    libxcomposite
+    libxdamage
+
+    # XCB utility libraries (needed by picom, i3, and others)
+    xcb-util
+    xcb-util-wm
+    xcb-util-keysyms
+    xcb-util-image
+    xcb-util-renderutil
+    xcb-util-cursor
 )
 
 # Fonts commonly needed for i3/polybar/rofi glyphs and icons
@@ -269,40 +312,137 @@ else
 fi
 
 # ------------------------------------------
-# Install Picom separately
+# Install Picom (auto-updating to latest)
 # ------------------------------------------
 #
-# Arch's official picom package is usually
-# recent enough, but we still verify the
-# version required by this configuration.
+# Arch's official 'picom' package tends to
+# track upstream releases quickly, so we try
+# that first. We also ask the GitHub API
+# (https://github.com/yshui/picom) what the
+# latest tagged release actually is; if the
+# repo package is behind (or missing), we
+# build the latest release from source with
+# meson/ninja instead.
 # ------------------------------------------
 
-PICOM_VERSION_REQUIRED="13"
+PICOM_REPO_URL="https://github.com/yshui/picom"
+PICOM_VERSION_REQUIRED="13"   # fallback if the GitHub API can't be reached
+
+info "Checking GitHub for the latest picom release..."
+
+PICOM_LATEST_TAG="$(curl -fsSL --max-time 10 \
+    https://api.github.com/repos/yshui/picom/releases/latest 2>/dev/null \
+    | grep -m1 '"tag_name"' \
+    | sed -E 's/.*"tag_name":\s*"([^"]+)".*/\1/' || true)"
+
+if [[ -n "$PICOM_LATEST_TAG" ]]; then
+    PICOM_VERSION_REQUIRED="${PICOM_LATEST_TAG#v}"
+    success "Latest picom release on GitHub: $PICOM_LATEST_TAG"
+else
+    warning "Could not reach the GitHub API; falling back to picom v$PICOM_VERSION_REQUIRED."
+    PICOM_LATEST_TAG="v$PICOM_VERSION_REQUIRED"
+fi
+
+# Build-time dependencies for compiling picom from source on Arch
+# (see "Dependencies" in the picom README: $PICOM_REPO_URL)
+PICOM_BUILD_DEPS=(
+    base-devel
+    git
+    meson
+    ninja
+    cmake
+    asciidoctor
+)
+
+# Runtime/library dependencies for picom on Arch
+PICOM_RUNTIME_DEPS=(
+    libx11
+    libxext
+    libxcb
+    xcb-util
+    xcb-util-image
+    xcb-util-renderutil
+    pixman
+    libconfig
+    dbus
+    libglvnd
+    libepoxy
+    pcre2
+    libev
+    uthash
+    xorgproto
+)
+
+build_picom_from_source() {
+    local tag="$1"
+
+    info "Building picom $tag from source ($PICOM_REPO_URL)..."
+
+    info "Installing picom build dependencies..."
+    sudo pacman -S --needed --noconfirm "${PICOM_BUILD_DEPS[@]}" "${PICOM_RUNTIME_DEPS[@]}"
+
+    local build_dir
+    build_dir="$(mktemp -d)"
+
+    if ! git clone --branch "$tag" --depth 1 "${PICOM_REPO_URL}.git" "$build_dir/picom"; then
+        error "Failed to clone picom $tag from $PICOM_REPO_URL."
+        rm -rf "$build_dir"
+        return 1
+    fi
+
+    (
+        cd "$build_dir/picom"
+        meson setup --buildtype=release build
+        ninja -C build
+    ) || {
+        error "Failed to build picom $tag."
+        rm -rf "$build_dir"
+        return 1
+    }
+
+    info "Installing picom $tag (requires sudo)..."
+    sudo ninja -C "$build_dir/picom/build" install
+
+    rm -rf "$build_dir"
+    return 0
+}
+
+PICOM_OK=false
 
 if command -v picom >/dev/null 2>&1; then
     PICOM_VERSION="$(picom --version 2>/dev/null | head -n1 || true)"
+    info "Existing picom detected: $PICOM_VERSION"
+    if [[ "$PICOM_VERSION" == *"$PICOM_VERSION_REQUIRED"* ]]; then
+        success "picom is already at the latest version ($PICOM_LATEST_TAG)."
+        PICOM_OK=true
+    fi
+fi
 
-    info "Existing Picom detected: $PICOM_VERSION"
+if [[ "$PICOM_OK" != true ]]; then
+    info "Trying picom from the official Arch repositories first..."
+    sudo pacman -S --needed --noconfirm picom || true
+
+    if command -v picom >/dev/null 2>&1; then
+        PICOM_VERSION="$(picom --version 2>/dev/null | head -n1 || true)"
+    else
+        PICOM_VERSION=""
+    fi
 
     if [[ "$PICOM_VERSION" == *"$PICOM_VERSION_REQUIRED"* ]]; then
-        success "Required Picom version already installed."
+        success "Installed picom $PICOM_VERSION from the official repositories (latest: $PICOM_LATEST_TAG)."
+        PICOM_OK=true
     else
-        warning "Installed Picom does not appear to be version $PICOM_VERSION_REQUIRED."
-        warning "Picom installation will need to be handled separately."
-    fi
-else
-    info "Installing picom from the official repositories..."
-    if sudo pacman -S --needed --noconfirm picom; then
-        PICOM_VERSION="$(picom --version 2>/dev/null | head -n1 || true)"
-        if [[ "$PICOM_VERSION" == *"$PICOM_VERSION_REQUIRED"* ]]; then
-            success "Picom $PICOM_VERSION_REQUIRED installed."
+        warning "Repo picom ($PICOM_VERSION) does not match the latest release ($PICOM_LATEST_TAG)."
+        info "Falling back to building picom $PICOM_LATEST_TAG from source..."
+
+        if build_picom_from_source "$PICOM_LATEST_TAG"; then
+            PICOM_VERSION="$(picom --version 2>/dev/null | head -n1 || true)"
+            success "picom built and installed from source: $PICOM_VERSION"
+            PICOM_OK=true
         else
-            warning "Installed Picom ($PICOM_VERSION) does not appear to be version $PICOM_VERSION_REQUIRED."
-            warning "Picom installation will need to be handled separately."
+            warning "Building picom from source failed."
+            warning "picom $PICOM_LATEST_TAG will need to be installed separately."
         fi
-    else
-        warning "Picom is not installed."
-        warning "Picom v$PICOM_VERSION_REQUIRED will need to be installed separately."
     fi
 fi
 
