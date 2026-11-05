@@ -31,6 +31,44 @@ Clone the repository:
 git clone https://github.com/Miraakz9/Light-i3-dotfiles.git
 cd Light-i3-dotfiles
 ```
+## Installation
+
+Assuming you are running a fresh Arch Linux installation, clone this repository and install the required packages.
+
+### 1. Install Xorg and dependencies
+
+```bash
+sudo pacman -S xorg-server xorg-xinit xorg-xrandr xorg-xset xorg-xprop xorg-xdpyinfo xdotool
+```
+
+### 2. Install graphics drivers
+
+For Intel graphics:
+
+```bash
+sudo pacman -S mesa
+```
+
+### 3. Install the window manager and status bar
+
+```bash
+sudo pacman -S i3-wm i3status
+```
+
+### 4. Install additional utilities
+
+```bash
+sudo pacman -S rofi polybar picom
+sudo pacman -S alacritty dunst feh thunar
+```
+
+Other required packages are listed in the `packages.txt` file.
+
+### 5. Display Manager (Optional)
+
+You can optionally install a display manager to handle graphical login sessions.
+
+
 ## Auto install everything for fresh i3wm installation
 
 Auto installer for fresh i3wm installation is untested.
