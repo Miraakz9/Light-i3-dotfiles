@@ -31,7 +31,7 @@ Clone the repository:
 git clone https://github.com/Miraakz9/Light-i3-dotfiles.git
 cd Light-i3-dotfiles
 ```
-## Installation
+## Manual Arch Linux Installation
 
 Assuming you are running a fresh Arch Linux installation, clone this repository and install the required packages.
 
